@@ -6,20 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="tw.com.abc.carmanager.MainActivity">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#00AAFF"
-    >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="車輛管理系統"
-            android:textSize="36sp"
-        />
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -51,30 +37,37 @@
             android:textSize="24sp"
             />
 
-        <EditText
-            android:id="@+id/carnum"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/spncarnum"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:entries="@array/carNumList"
+            android:spinnerMode="dropdown"
+            android:prompt="@string/carNumList_prompt"/>
 
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-        <TextView
+        android:orientation="horizontal">
+
+        <Button
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="用車日期:"
-            android:textSize="24sp"
-            />
+            android:onClick="btnDateOnClick"
+            android:text="用車日期:" />
 
         <EditText
-            android:id="@+id/cardate"
+            android:id="@+id/eddate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            />
 
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,12 +79,15 @@
             android:layout_height="wrap_content"
             android:text="起始公里數:"
             android:textSize="24sp"
+
             />
 
         <EditText
             android:id="@+id/carstartkm"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            />
 
     </LinearLayout>
     <LinearLayout
@@ -109,7 +105,9 @@
         <EditText
             android:id="@+id/carendkm"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            />
 
     </LinearLayout>
     <LinearLayout
@@ -127,7 +125,8 @@
         <EditText
             android:id="@+id/carNum"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:inputType="number"/>
 
     </LinearLayout>
     <LinearLayout
@@ -171,16 +170,18 @@
         android:orientation="horizontal"
         >
         <Button
-            android:id="@+id/btn1"
+            android:id="@+id/btnclean"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="清除"
+            android:onClick="btnClean"
             />
         <Button
-            android:id="@+id/btn2"
+            android:id="@+id/btnok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="送出"
+            android:onClick="btnOk"
             />
     </LinearLayout>
 </LinearLayout>
