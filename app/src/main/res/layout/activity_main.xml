@@ -184,5 +184,12 @@
             android:text="送出"
             android:onClick="btnOk"
             />
+        <Button
+            android:id="@+id/btntest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Test5"
+            android:onClick="updateDB"
+            />
     </LinearLayout>
 </LinearLayout>

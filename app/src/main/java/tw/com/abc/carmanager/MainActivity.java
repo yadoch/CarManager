@@ -1,6 +1,10 @@
 package tw.com.abc.carmanager;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,34 +18,68 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private Spinner spnCarNum;
     private String strCarNum;
     private TextView tvResult;
     private EditText edDate,edUser,edStartKm,edEndKm,edGasMoney,edMemo;
+    private boolean isPermissionOK;
     private ArrayAdapter<CharSequence> arrCarNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // 選取日期
-        edDate =(EditText) findViewById(R.id.eddate);
         edUser =(EditText) findViewById(R.id.eduser);
+        edDate =(EditText) findViewById(R.id.eddate);
         edStartKm=(EditText) findViewById(R.id.edstartkm);
         edEndKm=(EditText) findViewById(R.id.edendkm);
         edGasMoney=(EditText) findViewById(R.id.edgasmoney);
         edMemo=(EditText) findViewById(R.id.edmemo);
         tvResult= (TextView) findViewById(R.id.tvresult);
 
-
-
         // 下拉選項初始化
         spinnerInit();
 
+        // sd 卡事前處理
+        if (ContextCompat.checkSelfPermission(this,
+                // 要判斷的條件(網路,外部儲存裝置....)
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+            // no
+            ActivityCompat.requestPermissions(this,
+                    // 要判斷的條件(網路,外部儲存裝置....)
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    123);
+        }else {
+            isPermissionOK = true;
+            init();
+        }
+
     }
+    private void init(){
+        if (!isPermissionOK) {
+            finish();
+        }else{
+            go();
+        }
+        //Log.i("brad", "start");
+    }
+
+    private void go(){
+
+
+    }
+
+
 
     public void btnOk(View view) {
         if ("".equals(edUser.getText().toString().trim())) {
@@ -57,9 +95,37 @@ public class MainActivity extends AppCompatActivity {
                     getString(R.string.lb_gasmoney) + ":" + edGasMoney.getText() + "\n" +
                     getString(R.string.lb_memo) + ":" + edMemo.getText()
             );
+
+            updateDB();
         }
     }
-//清除畫面欄位
+
+    // 寫入資料庫
+    public void updateDB(){
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+
+                    URL url = new URL("http://10.1.1.85/default2.aspx?CarUser="+edUser.getText()+
+                            "&CarNum="+strCarNum+
+                            "&CarDate="+edDate.getText()+
+                            "&StartKm="+edStartKm.getText()+
+                            "&EndKm="+ edEndKm.getText()+
+                            "&GasMoney="+edGasMoney.getText()+
+                            "&CarMemo="+edMemo.getText());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.connect();
+                    conn.getInputStream();  // 一定要加,才能完成寫入動作
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                    Log.i("geoff",e.toString());
+                }
+            }
+        }.start();
+    }
+
+    //清除畫面欄位
     public void btnClean(View view){
 
         edDate.setText("");
@@ -126,3 +192,31 @@ public class MainActivity extends AppCompatActivity {
 
     };
 }
+/*
+//POST寫法,搞不定ASPX 端的問題暫時中止
+    public void test6(View view){
+
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    MultipartUtility mu = new MultipartUtility("http://10.1.1.85/default2.aspx","UTF-8");
+                    mu.addFormField("CarUser","Bill");
+                    mu.addFormField("CarNum","NA-2222");
+                    mu.addFormField("CarDate","NA-2222");
+                    mu.addFormField("StartKm","NA-2222");
+                    mu.addFormField("EndKm","NA-2222");
+                    mu.addFormField("GasMoney","NA-2222");
+                    mu.addFormField("CarMemo","NA-2222");
+                    List<String> ret =mu.finish();
+                    for (String line : ret ){
+                        Log.i("geoff",line);
+                    }
+                } catch (IOException e) {
+
+                    Log.i("geoff",e.toString());
+                }
+            }
+        }.start();
+    }
+*/
