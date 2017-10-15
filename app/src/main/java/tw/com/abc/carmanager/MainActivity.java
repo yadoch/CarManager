@@ -2,6 +2,7 @@ package tw.com.abc.carmanager;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,10 +22,14 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private ArrayList<CCarManager> list = new ArrayList<CCarManager>();
+    private int position =0;
+
     private Spinner spnCarNum;
     private String strCarNum;
     private TextView tvResult;
@@ -37,17 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 選取日期
-        edUser =(EditText) findViewById(R.id.eduser);
-        edDate =(EditText) findViewById(R.id.eddate);
-        edStartKm=(EditText) findViewById(R.id.edstartkm);
-        edEndKm=(EditText) findViewById(R.id.edendkm);
-        edGasMoney=(EditText) findViewById(R.id.edgasmoney);
-        edMemo=(EditText) findViewById(R.id.edmemo);
-        tvResult= (TextView) findViewById(R.id.tvresult);
-
-        // 下拉選項初始化
-        spinnerInit();
+        initComponent();
 
         // sd 卡事前處理
         if (ContextCompat.checkSelfPermission(this,
@@ -65,6 +60,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    private void initComponent(){
+        // 選取日期
+        edUser =(EditText) findViewById(R.id.eduser);
+        edDate =(EditText) findViewById(R.id.eddate);
+        edStartKm=(EditText) findViewById(R.id.edstartkm);
+        edEndKm=(EditText) findViewById(R.id.edendkm);
+        edGasMoney=(EditText) findViewById(R.id.edgasmoney);
+        edMemo=(EditText) findViewById(R.id.edmemo);
+        tvResult= (TextView) findViewById(R.id.tvresult);
+
+        // 下拉選項初始化
+        spinnerInit();
+    }
     private void init(){
         if (!isPermissionOK) {
             finish();
@@ -76,17 +84,42 @@ public class MainActivity extends AppCompatActivity {
 
     private void go(){
 
-
     }
 
 
 
     public void btnOk(View view) {
+
         if ("".equals(edUser.getText().toString().trim())) {
             tvResult.setText(getString(R.string.lb_user) + "未填寫");
 
         } else {
 
+            list.add(new CCarManager(
+                    edDate.getText().toString(),
+                    edUser.getText().toString(),
+                    strCarNum,
+                    edStartKm.getText().toString(),
+                    edEndKm.getText().toString(),
+                    edGasMoney.getText().toString(),
+                    edMemo.getText().toString()
+            ));
+
+            position =list.size()-1;
+
+            Log.i("geoff","position:"+position);
+
+
+            tvResult.setText(getString(R.string.lb_user) + ":" + list.get(position).getcUser() + "\n" +
+                    getString(R.string.lb_date) + ":" + list.get(position).getcDate() + "\n" +
+                    getString(R.string.lb_carnum) + ":" + list.get(position).getcCarNum() + "\n" +
+                    getString(R.string.lb_startkm) + ":" + list.get(position).getcStartKm()  + "\n" +
+                    getString(R.string.lb_endkm) + ":" + list.get(position).getcEndKm()  + "\n" +
+                    getString(R.string.lb_gasmoney) + ":" + list.get(position).getcGasMoney()  + "\n" +
+                    getString(R.string.lb_memo) + ":" + list.get(position).getCdMemo()
+            );
+
+/*
             tvResult.setText(getString(R.string.lb_user) + ":" + edUser.getText() + "\n" +
                     getString(R.string.lb_carnum) + ":" + strCarNum + "\n" +
                     getString(R.string.lb_date) + ":" + edDate.getText() + "\n" +
@@ -95,8 +128,10 @@ public class MainActivity extends AppCompatActivity {
                     getString(R.string.lb_gasmoney) + ":" + edGasMoney.getText() + "\n" +
                     getString(R.string.lb_memo) + ":" + edMemo.getText()
             );
-
+*/
+         // 要加入網路連線判斷,避免出錯
             updateDB();
+            clean();
         }
     }
 
@@ -127,7 +162,10 @@ public class MainActivity extends AppCompatActivity {
 
     //清除畫面欄位
     public void btnClean(View view){
+        clean();
+    }
 
+    private void clean(){
         edDate.setText("");
         edUser.setText("");
         edStartKm.setText("");
@@ -135,9 +173,8 @@ public class MainActivity extends AppCompatActivity {
         edGasMoney.setText("");
         edMemo.setText("");
         spnCarNum.setSelection(arrCarNum.getPosition("--請選擇--"));
-        tvResult.setText("");
-    }
 
+    }
 
     private AdapterView.OnItemSelectedListener spn =new AdapterView.OnItemSelectedListener(){
 
